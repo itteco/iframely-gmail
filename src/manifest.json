@@ -1,0 +1,29 @@
+{
+    "manifest_version": 2,
+
+    "minimum_chrome_version": "20",
+
+    "name": "Iframely for Gmail",
+    "description": "Your inbox rocks for private web links sharing. So watch embedded videos, photos and read articles - right in your Gmail",
+    "version": "0.1.2",
+    "icons": {
+        "128": "icons/iframely-icon-128x128.png"
+    },
+    "content_scripts": [ {
+        "js": [
+            "js/vendor/jquery-1.9.1.min.js",
+            "js/vendor/iframely.js",
+            "js/links_extractor.js"
+        ],
+        "matches": [ "https://mail.google.com/*" ],
+        "run_at": "document_end"
+    } ],
+    "background" : {
+        "scripts": ["js/background.js"]
+    },
+    "permissions": [
+        "https://mail.google.com/*",
+        "https://iframely.com/*"
+    ],
+    "content_security_policy": "script-src 'self' https://iframely.com; object-src 'self'"
+}
