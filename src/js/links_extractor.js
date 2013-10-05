@@ -242,6 +242,7 @@
                                 var $el = $.iframely.generateLinkElement(player, {iframelyData: data});
                                 var $div = $('<div>').addClass('s-player').append($el);
                                 $container.append($div);
+                                $.iframely.registerIframesIn($container);
 
                             } else {
 
