@@ -44,6 +44,7 @@
     // Re matched against a.href before fetching data, e.g. http://domain.com/unsubscribe
     var skipHrefRe = [
         /subscribe/i, // + unsubscribe
+        /subscription/i,
         /activate/i,
         /restore/i,
         /reset/i,
@@ -336,9 +337,9 @@
 
     function loadImageToEditor(link) {
 
-        // TODO: check if dangerous link
-        // TODO: filter by whitelist.
-        // TODO: filter by .jpg .png etc extension.
+        if (skippedHref(link.uri)) {
+            return;
+        }
 
         $.iframely.getPageData(link.uri, function(err, data) {
 
@@ -488,6 +489,7 @@
 
             var urls = $editor.html().replace(/<[^>]+>/g, " ").match(urlRe) || [];
 
+            // Filter unique.
             urls = urls.filter(function(url) {
                 var result = images.indexOf(url) == -1;
                 if (result) {
