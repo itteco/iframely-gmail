@@ -52,7 +52,8 @@
         /support/i,
         /about/i,
         /faq/i,
-        /help/i
+        /help/i,
+        /^mailto:/i
     ];
 
     var urlRe = /https?:\/\/[^ "]+/ig;
