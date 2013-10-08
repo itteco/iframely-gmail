@@ -53,7 +53,8 @@
         /about/i,
         /faq/i,
         /help/i,
-        /^mailto:/i
+        /^mailto:/i,
+        /^https?:\/\/[^\/]+\/?$/i
     ];
 
     var urlRe = /https?:\/\/[^ "]+/ig;
