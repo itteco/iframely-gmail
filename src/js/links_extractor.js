@@ -56,6 +56,7 @@
         /faq/i,
         /help/i,
         /^mailto:/i,
+        /^tel:/i,        
         /^https?:\/\/[^\/]+\/?$/i
     ];
 
