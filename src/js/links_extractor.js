@@ -50,6 +50,7 @@
         /reset/i,
         /contact/i,
         /support/i,
+        /form/i,        
         /about/i,
         /faq/i,
         /help/i,
