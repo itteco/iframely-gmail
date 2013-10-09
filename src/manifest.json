@@ -5,7 +5,7 @@
 
     "name": "Iframely for Gmail",
     "description": "As seen on Lifehacker.com: Watch embedded videos, photos and read articles - right in your Gmail",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "icons": {
         "128": "icons/iframely-icon-128x128.png"
     },
