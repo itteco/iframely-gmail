@@ -52,11 +52,16 @@
         /support/i,
         /form/i,
         /login/i,
+        /opt_out/i,        
         /about/i,
+        /verify/i,
+        /key/i,
         /faq/i,
         /help/i,
         /^mailto:/i,
-        /^tel:/i,        
+        /^tel:/i,
+        /linkedin/i,
+        /google/i,
         /^https?:\/\/[^\/]+\/?$/i
     ];
 
