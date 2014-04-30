@@ -23,7 +23,7 @@
     },
     "permissions": [
         "https://mail.google.com/*",
-        "https://iframely.com/*"
+        "https://iframe.ly/*"
     ],
-    "content_security_policy": "script-src 'self' https://iframely.com; object-src 'self'"
+    "content_security_policy": "script-src 'self' https://iframe.ly; object-src 'self'"
 }

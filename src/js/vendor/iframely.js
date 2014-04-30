@@ -4,7 +4,7 @@
 
      Iframely consumer client lib.
 
-     Versrion 0.5.2 - iframely gmail extension edition.
+     Versrion 0.6.2
 
      Fetches and renders iframely oebmed/2 widgets.
 
@@ -14,6 +14,8 @@
 
         return {
             postMessage : function(message, target_url, target) {
+
+                message = JSON.stringify(message);
 
                 target_url = target_url || '*';
 
@@ -29,35 +31,59 @@
 
             receiveMessage : function(callback) {
 
+                function cb(e) {
+                    var message;
+                    try {
+                        message = JSON.parse(e.data);
+                    } catch (ex) {
+                    }
+
+                    callback(e, message);
+                }
+
                 // browser supports window.postMessage
                 if (window['postMessage']) {
                     if (window['addEventListener']) {
-                        window[callback ? 'addEventListener' : 'removeEventListener']('message', callback, !1);
+                        window[callback ? 'addEventListener' : 'removeEventListener']('message', cb, !1);
                     } else {
-                        window[callback ? 'attachEvent' : 'detachEvent']('onmessage', callback);
+                        window[callback ? 'attachEvent' : 'detachEvent']('onmessage', cb);
                     }
                 }
             }
         };
     }();
 
+    $.ajaxPrefilter('script', function(options) {
+        if (options.url.indexOf("reader.js") > -1) {
+            options.cache = true;
+        }
+    });
+
     $.iframely = $.iframely || {};
     $.iframely.iframes = $.iframely.iframes || {};
 
-    windowMessaging.receiveMessage(function(e) {
+    windowMessaging.receiveMessage(function(e, message) {
         var $iframe;
-        if (e.data && e.data.windowId && ($iframe = $.iframely.iframes[e.data.windowId])) {
-            if ($.iframely.setIframeHeight && e.data.method == "resize" && e.data.height) {
-                $.iframely.setIframeHeight($iframe, e.data.height);
+        if (message && message.windowId && ($iframe = $.iframely.iframes[message.windowId])) {
+            if ($.iframely.setIframeHeight && message.method === "resize" && message.height) {
+                $.iframely.setIframeHeight($iframe, message.height);
             }
         }
     });
 
     $.iframely.setIframeHeight = function($iframe, height) {
-        $iframe
-            .parents('.iframely-widget-container')
-            .css('padding-bottom', '')
-            .css('height', height);
+
+        var $parent = $iframe.parents('.iframely-widget-container');
+
+        if ($parent.length > 0) {
+
+            $parent
+                .css('padding-bottom', '')
+                .css('height', height);
+
+        } else {
+            $iframe.css('height', height);
+        }
     };
 
     $.iframely.registerIframesIn = function($parent) {
@@ -98,12 +124,15 @@
             url: $.iframely.defaults.endpoint,
             dataType: "json",
             data: {
-                uri: uri,
+                uri: !options.url && uri,
+                url: options.url && uri,
                 debug: options.debug,
                 mixAllWithDomainPlugin: options.mixAllWithDomainPlugin,
                 refresh: options.refresh,
                 meta: options.meta,
-                whitelist: options.whitelist
+                whitelist: options.whitelist,
+                api_key: options.api_key,
+                from: options.from
             },
             success: function(data, textStatus, jqXHR) {
                 cb(null, data, jqXHR);
@@ -197,11 +226,6 @@
                     .addClass("iframely-widget iframely-script")
                     .attr('type', data.type)
                     .attr('src', data.href);
-                var $container = $('<div>')
-                    .attr('iframely-container-for', data.href)
-                    .append($script);
-
-                return $container;
             }
         },
         "image": {
@@ -239,49 +263,65 @@
 
                     // Find video aspect.
                     var media = data.media;
-                    var aspect = media["aspect-ratio"];
+                    var aspect, width;
+
                     if (media) {
-                        [
-                            ["min-width", "min-height"],
-                            ["max-width", "max-height"],
-                            ["width", "height"]
-                        ].forEach(function(dims) {
-                                var w = media[dims[0]];
-                                var h = media[dims[1]];
-                                if (w && h) {
-                                    aspect = w / h;
-                                }
-                            });
-                    }
 
-                    if (aspect) {
-                        // Find images with same aspect.
-                        var thumbnails = iframelyData.links.filter(function(link) {
-                            if (renders["image"].test(link) && (link.rel.indexOf('thumbnail') > -1 || link.rel.indexOf('image') > -1)) {
-                                var m = link.media;
-                                if (m && m.width && m.height) {
-                                    var imgAspect = m.width / m.height;
-                                    return Math.abs(imgAspect - aspect) < 0.1;
-                                }
-                            }
-                        });
+                        aspect = media["aspect-ratio"];
 
-                        if (thumbnails.length) {
-                            // Find largest image.
-                            var maxW = 0, image;
-                            thumbnails.forEach(function(link) {
-                                if (link.media.width > maxW) {
-                                    image = link;
-                                }
-                            });
-
-                            $video.attr("poster", image.href);
+                        if (!aspect) {
+                            [
+                                ["min-width", "min-height"],
+                                ["max-width", "max-height"],
+                                ["width", "height"]
+                            ].forEach(function(dims) {
+                                    width = media[dims[0]];
+                                    var height = media[dims[1]];
+                                    if (width && height) {
+                                        aspect = width / height;
+                                    }
+                                });
                         }
                     }
 
+                    // Find images with same aspect.
+                    var thumbnails = iframelyData.links.filter(function(link) {
+                        if (renders["image"].test(link) && (link.rel.indexOf('thumbnail') > -1 || link.rel.indexOf('image') > -1)) {
+                            var m = link.media;
+                            if (aspect && m && m.width && m.height) {
+                                var imgAspect = m.width / m.height;
+                                return Math.abs(imgAspect - aspect) < 0.1;
+                            }
+                            return true;
+                        }
+                    });
+
+                    // Find largest image.
+                    thumbnails.sort(function(a, b) {
+                        var w1 = a.media && a.media.width;
+                        var w2 = b.media && b.media.width;
+                        if (w1 == w2) {
+                            return 0;
+                        }
+                        if (w1 && w2) {
+                            return w2 - w1;
+                        }
+                        // Images without size goes last.
+                        if (!w1) {
+                            return 1;
+                        }
+                        if (!w2) {
+                            return -1;
+                        }
+                    });
+
+                    if (thumbnails.length) {
+                        $video.attr("poster", thumbnails[0].href);
+                    }
                 }
 
-                $video.append('<source />').children('source')
+                $video.append('<source />')
+                    .children('source')
                     .attr('src', data.href)
                     .attr('type', data.type);
 
@@ -303,13 +343,34 @@
                 var $iframe = $('<iframe>')
                     .addClass("iframely-widget iframely-iframe")
                     .attr('src', data.href)
-                    .attr('frameborder', '0');
+                    .attr('frameborder', '0')
+                    .attr('allowfullscreen', true)
+                    .attr('webkitallowfullscreen', true)
+                    .attr('mozallowfullscreen', true);
+
 
                 if (options && options.disableSizeWrapper) {
                     return $iframe;
                 } else {
                     return wrapContainer($iframe, data);
                 }
+            }
+        },
+        "inline": {
+            test: function(data) {
+                return data.type === "text/html"
+                    && data.rel.indexOf('inline') > -1
+                    && !data.href
+                    && data.html;
+            },
+            generate: function(data, options) {
+                var $el;
+                try {
+                    $el = $(data.html);
+                } catch(e) {
+                    $el = $('<div>').append(data.html);
+                }
+                return $el;
             }
         }
     };
@@ -503,7 +564,7 @@
         }
 
         function isHttps(href) {
-            return href.indexOf('//:') == 0 || href.indexOf('https://') == 0;
+            return /^(?:https:)?\/\/.+/i.test(href);
         }
 
         var result = links && links.filter && links.filter(function(link) {

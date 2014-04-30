@@ -1,27 +1,68 @@
 (function() {
 
-    var REST_WHITELIST = 'https://iframely.com/supported-plugins-re.json';
+    var REST_WHITELIST = 'https://iframe.ly/domains.json';
 
     var whitelisted;
     var whitelistedCache = {};
 
-    function _ajax(url, method, data, success){
+    var WHITELIST_TTL = 24 * 60 * 60 * 1000;
+    var WHITELIST_RETRY_TIMEOUT = 10 * 1000;
+
+    // Fetch whitelist.
+
+    function _ajax(url, method, data, success, error){
+        try {
+
+            var data = localStorage["xhr:" + url];
+            var data_at = localStorage["xhr:date:" + url];
+            if (data && data_at) {
+                var stored_at = parseInt(data_at);
+                if ((new Date()).getTime() - stored_at < WHITELIST_TTL) {
+                    console.log('return wl from cache');
+                    return success(JSON.parse(data));
+                }
+            }
+
+        } catch(e) {}
+
         var xhr = new XMLHttpRequest();
         xhr.open(method, url, true);
         xhr.setRequestHeader("Content-type","application/json");
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
+                console.log(xhr);
                 var data;
                 try{
                     data = JSON.parse(xhr.responseText);
                 } catch(e){}
-                if (data){
+                if (data && xhr.status === 200){
+
+                    localStorage["xhr:" + url] = xhr.responseText;
+                    localStorage["xhr:date:" + url] = (new Date()).getTime();
+
                     success(data);
+                } else {
+                    error();
                 }
             }
         };
         xhr.send(data);
     }
+
+    function fetchWhitelist() {
+        _ajax(REST_WHITELIST, 'GET', undefined, function(data){
+            setWhiteList(data);
+        }, function() {
+            setTimeout(fetchWhitelist, WHITELIST_RETRY_TIMEOUT);
+        });
+    }
+
+    setTimeout(function() {
+        fetchWhitelist();
+        setInterval(fetchWhitelist, WHITELIST_TTL + 1000);
+    }, 2000);
+
+    // End fetch whitelist.
 
     function isUrlWhitelisted(url){
         if (!whitelisted) return;
@@ -35,23 +76,11 @@
     }
 
     function setWhiteList(data){
-        if (whitelisted) return;
-
         whitelisted = [];
         data.forEach(function(re){
             whitelisted.push(new RegExp(re.s,re.m));
         });
     }
-
-    function getWhiteList(){
-        _ajax(REST_WHITELIST, 'GET', undefined, function(data){
-            clearInterval(retryWhitelist);
-            setWhiteList(data);
-        });
-    }
-
-    var retryWhitelist = setInterval(getWhiteList, 60*1000);
-    getWhiteList();
 
     chrome.extension.onMessage.addListener(
         function(message, sender, cb) {
