@@ -1,5 +1,8 @@
 (function() {
 
+    var api_key = '416cc19fe9a30033731f9fd97b2e1f66';
+    var DOMAIN = '//iframe.ly';
+
     var appId = chrome.runtime.id;
 
     function log() {
@@ -87,7 +90,7 @@
         return false;
     }
 
-    $.iframely.defaults.endpoint = "//iframe.ly/api/iframely";
+    $.iframely.defaults.endpoint = DOMAIN + "/api/iframely";
 
     function loadLink(link) {
 
@@ -98,7 +101,7 @@
             }
 
             $.iframely.getPageData(link.uri, {
-                api_key: '416cc19fe9a30033731f9fd97b2e1f66',
+                api_key: api_key,
                 origin: 'gmail',
                 url: true
             }, function(e, data) {
@@ -154,7 +157,7 @@
                         '                <iframe id="drive-viewer-video-player-object-0" class="aLF-aPX-ayV-aL3"' +
                         '                        style="width: 60%; height: 60%;" frameborder="0" allowfullscreen="1"' +
                         '                        title="YouTube video player" width="1165.8108108108108" height="655"' +
-                        '                        src="https://iframe.ly/' + data.id + '"></iframe>' +
+                        '                        src="' + DOMAIN + '/' + data.id + '"></iframe>' +
                         '            </div>' +
                         '            <div class="aLF-aPX-aPA">' +
                         '            </div>' +
