@@ -124,15 +124,15 @@
             url: $.iframely.defaults.endpoint,
             dataType: "json",
             data: {
-                uri: !options.url && uri,
-                url: options.url && uri,
+                uri: !options.url ? uri : undefined,
+                url: options.url ? uri : undefined,
                 debug: options.debug,
                 mixAllWithDomainPlugin: options.mixAllWithDomainPlugin,
                 refresh: options.refresh,
                 meta: options.meta,
                 whitelist: options.whitelist,
                 api_key: options.api_key,
-                from: options.from
+                origin: options.origin
             },
             success: function(data, textStatus, jqXHR) {
                 cb(null, data, jqXHR);
