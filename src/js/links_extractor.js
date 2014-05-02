@@ -246,7 +246,128 @@
         });
     }
 
+
+    function loadImageToEditor(link) {
+
+        if (skippedHref(link.uri)) {
+            return;
+        }
+
+        $.iframely.getPageData(link.uri, {
+            api_key: api_key,
+            origin: 'gmail',
+            url: true
+        }, function(err, data) {
+
+            if (err) {
+                error("iframely error on", link.uri, err, data);
+                return;
+            }
+
+            var title = data.meta.title;
+
+            var links = [];
+            for(var key in data.links) {
+                links = links.concat(data.links[key]);
+            }
+            data.links = links;
+
+            var image;
+
+            // Find big image.
+            var images = $.iframely.filterLinksByRel(["thumbnail", "image"], data.links, {httpsOnly: true});
+            if (images.length == 0) {
+                images = $.iframely.filterLinksByRel(["thumbnail", "image"], data.links);
+            }
+            var image = $.iframely.findBestFittedLink(link.$editor.width(), link.$editor.width(), images);
+
+            if (!image) {
+                // Skip non interesting link.
+                return;
+            }
+
+            if (link.$editor.find('img[src="' + image.href + '"]').length > 0) {
+                // Skip inserted image;
+                return;
+            }
+
+            var iframelyUrl = "http:" + DOMAIN + "/" + data.id;
+
+            var $div = $('<div>');
+
+            var $a = $('<a href="' + iframelyUrl + '" target="_blank"></a>');
+            var $img = $('<img>')
+                .css("max-width", "100%")
+                .attr('src', image.href);
+            $a.append($img);
+
+            if (title) {
+                $img
+                    .attr('title', title)
+                    .attr('alt', title);
+                $div.append('<a href="' + iframelyUrl + '" target="_blank">' + title + '</a><br>');
+            }
+
+            $div.append($a);
+
+            var $p = null;
+            var $firstP = null;
+            link.$editor.find('div').each(function() {
+                var $this = $(this);
+                if (!$firstP) {
+                    $firstP = $this;
+                }
+                if (!$p && $this.text().indexOf(link.uri) > -1) {
+                    $p = $this;
+                }
+            });
+
+            if ($p) {
+                $p.after($div);
+            } else if ($firstP) {
+                $firstP.after($div);
+            } else {
+                link.$editor.append('<br>');
+                link.$editor.append($div);
+            }
+        });
+    }
+
+    var insertedImages = {};
+
+    function runEditorFeature() {
+
+        $('.Am.Al.editable.LW-avf').each(function() {
+
+            var $editor = $(this);
+
+            var id = $editor.attr('id');
+
+            var images = insertedImages[id] = insertedImages[id] || [];
+
+            var urls = $editor.html().replace(/<[^>]+>/g, " ").match(urlRe) || [];
+
+            // Filter unique.
+            urls = urls.filter(function(url) {
+                var result = images.indexOf(url) == -1;
+                if (result) {
+                    images.push(url);
+                }
+                return result;
+            });
+
+            urls.forEach(function(url) {
+                loadImageToEditor({
+                    uri: url,
+                    $editor: $editor
+                });
+            });
+        });
+    }
+
     setInterval(function() {
+
+        runEditorFeature();
 
         runLinkParsing();
 
