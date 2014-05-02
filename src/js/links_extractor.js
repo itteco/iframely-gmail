@@ -298,17 +298,17 @@
             var $a = $('<a href="' + iframelyUrl + '" target="_blank"></a>');
             var $img = $('<img>')
                 .css("max-width", "100%")
-                .attr('src', image.href);
+                .attr('src', image.href.replace(/^\/\//, 'https://'));
             $a.append($img);
+
+            $div.append($a);
 
             if (title) {
                 $img
                     .attr('title', title)
                     .attr('alt', title);
-                $div.append('<a href="' + iframelyUrl + '" target="_blank">' + title + '</a><br>');
+                $div.append('<br><a href="' + iframelyUrl + '" target="_blank">' + title + '</a>');
             }
-
-            $div.append($a);
 
             var $p = null;
             var $firstP = null;
