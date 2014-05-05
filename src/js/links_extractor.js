@@ -27,6 +27,12 @@
         }, cb);
     }
 
+    function enableEditorFeature(cb) {
+        chrome.extension.sendMessage({method: "getLocalStorage", key: "disable-editor-feature"}, function(result) {
+            cb(result != "true")
+        });
+    }
+
     // Re matched against <from>, where email is <from>@domain.com
     var skipFromRe = [
         /support/i,
@@ -199,7 +205,7 @@
 
                     $('body>*').each(function() {
                         $(this).attr('aria-hidden', 'true');
-                    })
+                    });
                     var $body = $('body');
                     $body.append(x);
                     $body.addClass('aLF-aPX-aPs-JQ');
@@ -399,9 +405,13 @@
 
     setInterval(function() {
 
-        runEditorFeature();
-
         runLinkParsing();
+
+        enableEditorFeature(function(enabled) {
+            if (enabled) {
+                runEditorFeature();
+            }
+        });
 
     }, 1000);
 
