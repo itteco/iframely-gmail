@@ -68,7 +68,7 @@
         /^https?:\/\/[^\/]+\/?$/i
     ];
 
-    var urlRe = /https?:\/\/[^ "]+/ig;
+    var urlRe = /https?:\/\/[^ ,"]+/ig;
 
     function skippedHref(uri) {
         for(var i = 0; i < skipHrefRe.length; i++) {
