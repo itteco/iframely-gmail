@@ -92,6 +92,48 @@
 
     $.iframely.defaults.endpoint = DOMAIN + "/api/iframely";
 
+    var linksCache = {};
+
+    function loadLinkCached(uri, cb) {
+
+        var cache = linksCache[uri] = linksCache[uri] || {};
+
+        if (cache.error) {
+            return;
+        }
+
+        if (cache.data) {
+            return cb(cache.data);
+        }
+
+        var stack = cache.stack = cache.stack || [];
+
+        stack.push(cb);
+
+        if (!cache.loading) {
+            cache.loading = true;
+
+            $.iframely.getPageData(uri, {
+                api_key: api_key,
+                origin: 'gmail',
+                url: true
+            }, function(e, data) {
+
+                if (e) {
+                    cache.error = e;
+                    error("iframely error on", uri, e, data);
+                    return;
+                }
+
+                cache.data = data;
+
+                stack.forEach(function(cb) {
+                    cb(data);
+                });
+            });
+        }
+    }
+
     function loadLink(link) {
 
         isWhitelisted(link.uri, function(whitelisted) {
@@ -100,16 +142,7 @@
                 return;
             }
 
-            $.iframely.getPageData(link.uri, {
-                api_key: api_key,
-                origin: 'gmail',
-                url: true
-            }, function(e, data) {
-
-                if (e) {
-                    error("iframely error on", link.uri, e, data);
-                    return;
-                }
+            loadLinkCached(link.uri, function(data) {
 
                 var image, player;
 
@@ -253,16 +286,7 @@
             return;
         }
 
-        $.iframely.getPageData(link.uri, {
-            api_key: api_key,
-            origin: 'gmail',
-            url: true
-        }, function(err, data) {
-
-            if (err) {
-                error("iframely error on", link.uri, err, data);
-                return;
-            }
+        loadLinkCached(link.uri, function(data) {
 
             var title = data.meta.title;
 
