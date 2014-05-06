@@ -329,45 +329,56 @@
                 return;
             }
 
-            var iframelyUrl = "http:" + DOMAIN + "/" + data.id;
+            var imageUrl = image.href.replace(/^\/\//, 'https://');
 
-            var $div = $('<div>');
+            $("<img/>")
+                .load(function() {
 
-            var $a = $('<a href="' + iframelyUrl + '" target="_blank"></a>');
-            var $img = $('<img>')
-                .css("max-width", "100%")
-                .attr('src', image.href.replace(/^\/\//, 'https://'));
-            $a.append($img);
+                    var iframelyUrl = "http:" + DOMAIN + "/" + data.id;
 
-            $div.append($a);
+                    var $div = $('<div>');
 
-            if (title) {
-                $img
-                    .attr('title', title)
-                    .attr('alt', title);
-                $div.append('<br><a href="' + iframelyUrl + '" target="_blank">' + title + '</a>');
-            }
+                    var $a = $('<a href="' + iframelyUrl + '" target="_blank"></a>');
+                    var $img = $('<img>')
+                        .css("max-width", "100%")
+                        .attr('src', imageUrl);
+                    $a.append($img);
 
-            var $p = null;
-            var $firstP = null;
-            link.$editor.find('div').each(function() {
-                var $this = $(this);
-                if (!$firstP) {
-                    $firstP = $this;
-                }
-                if (!$p && $this.text().indexOf(link.uri) > -1) {
-                    $p = $this;
-                }
-            });
+                    $div.append($a);
 
-            if ($p) {
-                $p.after($div);
-            } else if ($firstP) {
-                $firstP.after($div);
-            } else {
-                link.$editor.append('<br>');
-                link.$editor.append($div);
-            }
+                    if (title) {
+                        $img
+                            .attr('title', title)
+                            .attr('alt', title);
+                        $div.append('<br><a href="' + iframelyUrl + '" target="_blank">' + title + '</a>');
+                    }
+
+                    var $p = null;
+                    var $firstP = null;
+                    link.$editor.find('div').each(function() {
+                        var $this = $(this);
+                        if (!$firstP) {
+                            $firstP = $this;
+                        }
+                        if (!$p && $this.text().indexOf(link.uri) > -1) {
+                            $p = $this;
+                        }
+                    });
+
+                    if ($p) {
+                        $p.after($div);
+                    } else if ($firstP) {
+                        $firstP.after($div);
+                    } else {
+                        link.$editor.append('<br>');
+                        link.$editor.append($div);
+                    }
+
+                })
+                .error(function() {
+                    // NOP.
+                })
+                .attr("src", imageUrl);
         });
     }
 
