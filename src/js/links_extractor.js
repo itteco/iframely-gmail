@@ -317,7 +317,7 @@
             if (images.length == 0) {
                 images = $.iframely.filterLinksByRel(["thumbnail", "image"], data.links);
             }
-            var image = $.iframely.findBestFittedLink(link.$editor.width(), link.$editor.width(), images);
+            var image = $.iframely.findBestFittedLink(200, 200, images);
 
             if (!image) {
                 // Skip non interesting link.
@@ -340,7 +340,7 @@
 
                     var $a = $('<a href="' + iframelyUrl + '" target="_blank"></a>');
                     var $img = $('<img>')
-                        .css("max-width", "100%")
+                        .css("max-width", "50%")
                         .attr('src', imageUrl);
                     $a.append($img);
 
