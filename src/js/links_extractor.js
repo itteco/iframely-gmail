@@ -1,7 +1,7 @@
 (function() {
 
-    var api_key = '416cc19fe9a30033731f9fd97b2e1f66';
     var DOMAIN = '//iframe.ly';
+    var API_ENDPOINT = '//iframely.com/gmail';
 
     var appId = chrome.runtime.id;
 
@@ -96,11 +96,11 @@
         return false;
     }
 
-    $.iframely.defaults.endpoint = DOMAIN + "/api/iframely";
+    $.iframely.defaults.endpoint = API_ENDPOINT;
 
     var linksCache = {};
 
-    function loadLinkCached(uri, cb) {
+    function loadLinkCached(uri, origin, cb) {
 
         var cache = linksCache[uri] = linksCache[uri] || {};
 
@@ -120,8 +120,7 @@
             cache.loading = true;
 
             $.iframely.getPageData(uri, {
-                api_key: api_key,
-                origin: 'gmail',
+                origin: origin,
                 url: true
             }, function(e, data) {
 
@@ -148,7 +147,7 @@
                 return;
             }
 
-            loadLinkCached(link.uri, function(data) {
+            loadLinkCached(link.uri, 'gmail', function(data) {
 
                 var image, player;
 
@@ -300,7 +299,7 @@
             return;
         }
 
-        loadLinkCached(link.uri, function(data) {
+        loadLinkCached(link.uri, 'geditor', function(data) {
 
             var title = data.meta.title;
 
