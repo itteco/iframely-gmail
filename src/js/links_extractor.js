@@ -154,19 +154,9 @@
                 }
                 data.links = links;
 
-                // Find big image.
-                var images = $.iframely.filterLinksByRel("image", data.links, {httpsOnly: true});
-                if (images.length == 0) {
-                    images = $.iframely.filterLinksByRel("image", data.links);
-                }
-
-                var $window = $(window);
-                var image = $.iframely.findBestFittedLink($window.width(), $window.width(), images);
-
-                // Find player or survey or reader.
-                var player = $.iframely.filterLinksByRel(["player", "survey", "reader"], data.links, {httpsFirst: true, returnOne: true});
-
-                if (!image && !player) {
+                // Find good link.
+                var foundLink = $.iframely.filterLinksByRel(["player", "survey", "reader", "image", "app"], data.links, {returnOne: true});
+                if (!foundLink) {
                     // Skip non interesting link.
                     return;
                 }
@@ -174,14 +164,12 @@
                 link.$el.click(function(e) {
                     e.preventDefault();
 
-                    var foundLink = image || player;
                     var m = foundLink.media;
                     var aspect = m['aspect-ratio'];
                     if (!aspect && m.width && m.height) {
                         aspect = m.width / m.height;
                     }
                     aspect = aspect || 4/3;
-
 
                     var x =
                         '<div class="iframely-gmail">' +
