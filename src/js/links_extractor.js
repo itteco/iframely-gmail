@@ -175,6 +175,15 @@
                 link.$el.click(function(e) {
                     e.preventDefault();
 
+                    var foundLink = image || player;
+                    var m = foundLink.media;
+                    var aspect = m['aspect-ratio'];
+                    if (!aspect && m.width && m.height) {
+                        aspect = m.width / m.height;
+                    }
+                    aspect = aspect || 4/3;
+
+
                     var x =
                         '<div class="iframely-gmail">' +
                         '    <div class="iframely-gmail__toolbar">' +
@@ -185,7 +194,7 @@
                         '    <div class="iframely-gmail__wrapper">' +
                         '        <div class="iframely-gmail__container">' +
                         '            <div class="iframely-gmail__embed">' +
-                        '                <div class="iframely-widget-container" style="left: 0px; width: 100%; height: 0px; position: relative; padding-bottom: 42%;">' +
+                        '                <div class="iframely-widget-container" style="left: 0px; width: 100%; height: 0px; position: relative; padding-bottom: ' + 100/aspect + '%;">' +
                         '                   <iframe class="iframely-widget iframely-iframe" src="' + DOMAIN + '/' + data.id + ' " frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="top: 0px; left: 0px; width: 100%; height: 100%; position: absolute;"></iframe>' +
                         '                </div>' +
                         '            </div>' +
