@@ -179,13 +179,7 @@
                         '        <button class="iframely-gmail__btn iframely-gmail__btn--close s-close" title="Close"></button>' +
                         '    </div>' +
                         '    <div class="iframely-gmail__wrapper">' +
-                        '        <div class="iframely-gmail__container">' +
-                        '            <div class="iframely-gmail__embed">' +
-                        '                <div class="iframely-widget-container" style="left: 0px; width: 100%; height: 0px; position: relative; padding-bottom: ' + 100/aspect + '%;">' +
-                        '                   <iframe class="iframely-widget iframely-iframe" src="' + DOMAIN + '/' + data.id + ' " frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="top: 0px; left: 0px; width: 100%; height: 100%; position: absolute;"></iframe>' +
-                        '                </div>' +
-                        '            </div>' +
-                        '        </div>' +
+            '                   <iframe class="iframely-widget iframely-iframe" src="' + DOMAIN + '/' + data.id + ' " frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="top: 0px; left: 0px; width: 100%; height: 100%;"></iframe>' +
                         '    </div>' +
                         '</div>';
 
