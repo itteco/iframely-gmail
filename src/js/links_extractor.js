@@ -155,7 +155,7 @@
                 data.links = links;
 
                 // Find good link.
-                var foundLink = $.iframely.filterLinksByRel(["player", "survey", "reader", "image", "app"], data.links, {returnOne: true});
+                var foundLink = $.iframely.filterLinksByRel(["player", "survey", "reader", "app", "image"], data.links, {returnOne: true});
                 if (!foundLink) {
                     // Skip non interesting link.
                     return;
@@ -203,8 +203,8 @@
                     function resize() {
                         var cw = $container.width();
                         var ch = $container.height();
-                        var tw = Math.min(cw, m['max-width'] || cw);
-                        var th = Math.min(ch, m['max-height'] || ch);
+                        var tw = Math.min(cw, m['width'] || m['max-width'] || cw);
+                        var th = Math.min(ch, m['height'] || m['max-height'] || ch);
                         var ca = tw/th;
                         var width, height;
                         if (ca < aspect) {
