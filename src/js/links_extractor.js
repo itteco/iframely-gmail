@@ -3,8 +3,6 @@
     var DOMAIN = '//iframe.ly';
     var API_ENDPOINT = '//iframely.com/gmail';
 
-    var appId = chrome.runtime.id;
-
     function log() {
         console.log.apply(console, arguments);
     }
@@ -178,36 +176,26 @@
                     e.preventDefault();
 
                     var x =
-                        '<div class="aLF-aPX aLF-aPX-a5n aLF-aPX-aLK-aPD-JE s-overlay" tabindex="0" style="opacity: 1;">' +
-                        '    <div class="aT1-aTZ aLF-aPX-auR" tabindex="0"></div>' +
-                        '    <div class="aLF-aPX-aXi-I J-J5-Ji aLF-aPX-I s-open-new" aria-label="Open in new window" title="Open in new window" role="button" tabindex="0"' +
-                        '         style="-webkit-user-select: none; right: 37px;">' +
-                        '        <div class="aLF-aPX-JX aLF-aPX-Km-JX"></div>' +
+                        '<div class="iframely-gmail">' +
+                        '    <div class="iframely-gmail__toolbar">' +
+                        '        <a href="http://iframely.com/" class="iframely-gmail__btn iframely-gmail__btn--logo" title="Go to Iframely.com"></a>' +
+                        '        <button class="iframely-gmail__btn iframely-gmail__btn--link s-open-new" title="Pop-out"></button>' +
+                        '        <button class="iframely-gmail__btn iframely-gmail__btn--close s-close" title="Close"></button>' +
                         '    </div>' +
-                        '    <div class="aLF-aPX-Jq-I J-J5-Ji aLF-aPX-I s-close" aria-label="Close" title="Close" role="button" tabindex="0"' +
-                        '         style="-webkit-user-select: none; right: 12px;">' +
-                        '        <div class="aLF-aPX-JX aLF-aPX-Km-JX"></div>' +
-                        '    </div>' +
-                        '    <div class="aLF-aPX-aPk"' +
-                        '        <div class="aLF-aPX-aPk-aMh aLF-aPX-Jq-aPn" style="width: 100%; height: 100%; margin: 10%; margin-left: 20%;">' +
-                        '            <div class="aLF-aPX-ayV aLF-aPX-ayV-aPV" tabindex="0"' +
-                        '                <div class="aLF-aPX-ayV-atM"></div>' +
-                        '                <iframe id="drive-viewer-video-player-object-0" class="aLF-aPX-ayV-aL3"' +
-                        '                        style="width: 60%; height: 60%;" frameborder="0" allowfullscreen="1"' +
-                        '                        title="YouTube video player" width="1165.8108108108108" height="655"' +
-                        '                        src="' + DOMAIN + '/' + data.id + '"></iframe>' +
+                        '    <div class="iframely-gmail__wrapper">' +
+                        '        <div class="iframely-gmail__container">' +
+                        '            <div class="iframely-gmail__embed">' +
+                        '                <div class="iframely-widget-container" style="left: 0px; width: 100%; height: 0px; position: relative; padding-bottom: 42%;">' +
+                        '                   <iframe class="iframely-widget iframely-iframe" src="' + DOMAIN + '/' + data.id + ' " frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="top: 0px; left: 0px; width: 100%; height: 100%; position: absolute;"></iframe>' +
+                        '                </div>' +
                         '            </div>' +
-                        '            <div class="aLF-aPX-aPA">' +
-                        '            </div>' +
+                        '        </div>' +
                         '    </div>' +
                         '</div>';
 
-                    $('body>*').each(function() {
-                        $(this).attr('aria-hidden', 'true');
-                    });
                     var $body = $('body');
+
                     $body.append(x);
-                    $body.addClass('aLF-aPX-aPs-JQ');
 
                     $body.on('keydown.iframely',function(e) {
                         if (e.keyCode === 27) {
@@ -216,29 +204,16 @@
                     });
 
                     function close() {
-                        $body.removeClass('aLF-aPX-aPs-JQ');
-                        $('.s-overlay').remove();
-                        $('body>*').each(function() {
-                            $(this).removeAttr('aria-hidden');
-                        });
                         $body.off('keydown.iframely');
+                        $body.find('.iframely-gmail').remove();
                     }
 
-                    var $buttonOpen = $body.find('.s-open-new').click(function() {
+                    $body.find('.s-open-new').click(function() {
                         var win = window.open(link.uri, '_blank');
                         win.focus();
-                        $buttonOpen.removeClass('aLF-aPX-I-JW');
-                    }).hover(function() {
-                        $buttonOpen.addClass('aLF-aPX-I-JW');
-                    }, function() {
-                        $buttonOpen.removeClass('aLF-aPX-I-JW');
                     });
 
-                    var $buttonClose = $body.find('.s-close').click(close).hover(function() {
-                        $buttonClose.addClass('aLF-aPX-I-JW');
-                    }, function() {
-                        $buttonClose.removeClass('aLF-aPX-I-JW');
-                    });
+                    $body.find('.s-close').click(close);
                 });
             });
         });
@@ -424,5 +399,8 @@
         });
 
     }, 1000);
+
+    var css = chrome.extension.getURL('css/styles.css');
+    $('head').append('<link rel="stylesheet" href="' + css + '" type="text/css" />');
 
 })();
