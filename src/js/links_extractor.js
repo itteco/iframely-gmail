@@ -161,6 +161,10 @@
                     return;
                 }
 
+                if (data.meta.title) {
+                    link.$el.attr('title', data.meta.title);
+                }
+
                 link.$el.click(function(e) {
                     e.preventDefault();
 
