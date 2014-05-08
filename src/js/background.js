@@ -97,10 +97,13 @@
     );
 
     function onInstall(currentVersion) {
-        chrome.tabs.create({url: 'http://iframely.com/gmail-thankyou'});
+        chrome.tabs.create({url: 'http://iframe.ly/gmail-thankyou'});
     }
 
     function onUpdate(currentVersion, prevVersion) {
+        if (currentVersion == "0.1.6") {
+            chrome.tabs.create({url: 'http://iframe.ly/gmail-updated'});
+        }
     }
 
     // Check if the version has changed.

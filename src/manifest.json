@@ -4,8 +4,8 @@
     "minimum_chrome_version": "20",
 
     "name": "Iframely for Gmail",
-    "description": "As seen on Lifehacker.com: Watch embedded videos, photos and read articles - right in your Gmail",
-    "version": "0.1.5",
+    "description": "As seen on Lifehacker.com: Watch embedded videos, photos and other media - right in your Gmail",
+    "version": "0.1.6",
     "icons": {
         "128": "icons/iframely-icon-128x128.png"
     },
