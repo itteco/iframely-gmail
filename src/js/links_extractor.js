@@ -179,11 +179,12 @@
                         '        <button class="iframely-gmail__btn iframely-gmail__btn--close s-close" title="Close"></button>' +
                         '    </div>' +
                         '    <div class="iframely-gmail__wrapper">' +
-            '                   <iframe class="iframely-widget iframely-iframe" src="' + DOMAIN + '/' + data.id + ' " frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="top: 0px; left: 0px; width: 100%; height: 100%;"></iframe>' +
+                        '        <iframe class="iframely-widget iframely-iframe" src="' + DOMAIN + '/' + data.id + ' " frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="position: relative;"></iframe>' +
                         '    </div>' +
                         '</div>';
 
                     var $body = $('body');
+                    var $window = $(window);
 
                     $body.append(x);
 
@@ -192,6 +193,31 @@
                             close();
                         }
                     });
+
+                    var $container = $('.iframely-gmail__wrapper');
+                    var $iframe = $('.iframely-iframe');
+                    function resize() {
+                        var cw = $container.width();
+                        var ch = $container.height();
+                        var ca = cw/ch;
+                        if (ca < aspect) {
+                            $iframe.css('width', '100%');
+                            var height = cw / aspect;
+                            $iframe.css('height', height);
+                            $iframe.css('top', (ch - height) / 2);
+                            $iframe.css('left', 0);
+                        } else {
+                            $iframe.css('height', '100%');
+                            var width = ch * aspect;
+                            $iframe.css('width', width);
+                            $iframe.css('left', (cw - width) / 2);
+                            $iframe.css('top', 0);
+                        }
+                    }
+
+                    resize();
+
+                    $window.on('resize.iframely', resize);
 
                     function close() {
                         $body.off('keydown.iframely');
