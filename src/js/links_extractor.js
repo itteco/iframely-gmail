@@ -68,8 +68,7 @@
         /^mailto:/i,
         /^tel:/i,
         /linkedin/i,
-        /google/i,
-        /^https?:\/\/[^\/]+\/?$/i
+        /google/i
     ];
 
     var urlRe = /https?:\/\/[^ ,"]+/ig;
@@ -187,7 +186,7 @@
                     var x =
                         '<div class="iframely-gmail">' +
                         '    <div class="iframely-gmail__toolbar">' +
-                        '        <a href="http://iframely.com/" class="iframely-gmail__btn iframely-gmail__btn--logo" title="Go to Iframely.com"></a>' +
+                        '        <a href="http://iframe.ly/" class="iframely-gmail__btn iframely-gmail__btn--logo" title="Go to Iframely"></a>' +
                         '        <button class="iframely-gmail__btn iframely-gmail__btn--link s-open-new" title="Pop-out"></button>' +
                         '        <button class="iframely-gmail__btn iframely-gmail__btn--close s-close" title="Close"></button>' +
                         '    </div>' +
