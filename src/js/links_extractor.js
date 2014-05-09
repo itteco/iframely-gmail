@@ -178,12 +178,12 @@
                     var x =
                         '<div class="iframely-gmail">' +
                         '    <div class="iframely-gmail__toolbar">' +
-                        '        <a href="http://iframe.ly/" class="iframely-gmail__btn iframely-gmail__btn--logo" title="Go to Iframely"></a>' +
+                        '        <a href="' + DOMAIN + '/' + data.id + '" target="_blank" class="iframely-gmail__btn iframely-gmail__btn--logo" title="Go to Iframely"></a>' +
                         '        <button class="iframely-gmail__btn iframely-gmail__btn--link s-open-new" title="Pop-out"></button>' +
                         '        <button class="iframely-gmail__btn iframely-gmail__btn--close s-close" title="Close"></button>' +
                         '    </div>' +
                         '    <div class="iframely-gmail__wrapper">' +
-                        '        <iframe class="iframely-widget iframely-iframe" src="' + DOMAIN + '/' + data.id + ' " frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="position: relative;"></iframe>' +
+                        '        <iframe class="iframely-widget iframely-iframe" src="' + DOMAIN + '/' + data.id + '" frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="position: relative;"></iframe>' +
                         '    </div>' +
                         '</div>';
 
