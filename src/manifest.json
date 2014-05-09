@@ -5,7 +5,7 @@
 
     "name": "Iframely for Gmail",
     "description": "As seen on Lifehacker.com: Watch embedded videos, photos and other media - right in your Gmail",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "icons": {
         "128": "icons/iframely-icon-128x128.png"
     },
@@ -23,7 +23,7 @@
     },
     "permissions": [
         "https://mail.google.com/*",
-        "https://iframe.ly/*"
+        "https://iframely.com/*"
     ],
     "options_page": "options/options.html",
     "web_accessible_resources": ["css/styles.css", "icons/icons.svg"]
