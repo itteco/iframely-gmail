@@ -21,10 +21,6 @@
     "background" : {
         "scripts": ["js/background.js"]
     },
-    "permissions": [
-        "https://mail.google.com/*",
-        "https://iframely.com/*"
-    ],
     "options_page": "options/options.html",
     "web_accessible_resources": ["css/styles.css", "icons/icons.svg"]
 }
