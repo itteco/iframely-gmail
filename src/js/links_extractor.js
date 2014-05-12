@@ -155,7 +155,7 @@
                 data.links = links;
 
                 // Find good link.
-                var foundLink = $.iframely.filterLinksByRel(["player", "survey", "reader", "app", "image"], data.links, {returnOne: true});
+                var foundLink = $.iframely.filterLinksByRel(["player", "survey", "reader", "app", "image"], data.links, {returnOne: true, httpsFirst: true});
                 if (!foundLink) {
                     // Skip non interesting link.
                     return;
