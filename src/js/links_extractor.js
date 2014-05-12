@@ -168,7 +168,7 @@
                 link.$el.click(function(e) {
                     e.preventDefault();
 
-                    if (foundLink.href.indexOf('http://') === 0 && foundLink.type.indexOf('image') === -1 && foundLink.type.indexOf('video') === -1) {
+                    if (foundLink.href && foundLink.href.indexOf('http://') === 0 && foundLink.type.indexOf('image') === -1 && foundLink.type.indexOf('video') === -1) {
                         var win = window.open('http://' + DOMAIN + '/' + data.id, '_blank');
                         win.focus();
                         return;
