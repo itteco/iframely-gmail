@@ -403,7 +403,17 @@
 
             var images = insertedImages[id] = insertedImages[id] || [];
 
-            var urls = $editor.html().split('--').slice(0, -1).join('--').replace(/(<wbr>|&nbsp;)/g, "").replace(/<[^>]+>/g, " ").match(urlRe) || [];
+            var bits = $editor.html().split('--');
+            if (bits > 0) {
+                bits = bits.slice(0, -1);
+            }
+
+            var text = bits.join('--');
+
+            var urls = text
+                .replace(/(<wbr>|&nbsp;)/g, "")
+                .replace(/<[^>]+>/g, " ")
+                .match(urlRe) || [];
 
             // Filter unique.
             urls = urls.filter(function(url) {
