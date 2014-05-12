@@ -395,7 +395,7 @@
 
     function runEditorFeature() {
 
-        $('.Am.Al.editable.LW-avf').each(function() {
+        $('.Am.Al.editable.LW-avf:focus').each(function() {
 
             var $editor = $(this);
 
@@ -403,7 +403,7 @@
 
             var images = insertedImages[id] = insertedImages[id] || [];
 
-            var urls = $editor.html().split('--').slice(0, -1).join('--').replace(/<wbr>/g, "").replace(/<[^>]+>/g, " ").match(urlRe) || [];
+            var urls = $editor.html().split('--').slice(0, -1).join('--').replace(/(<wbr>|&nbsp;)/g, "").replace(/<[^>]+>/g, " ").match(urlRe) || [];
 
             // Filter unique.
             urls = urls.filter(function(url) {
@@ -429,11 +429,17 @@
 
         enableEditorFeature(function(enabled) {
             if (enabled) {
-                runEditorFeature();
+
             }
         });
 
     }, 1000);
+
+    $('body').keyup(function(e) {
+        if (e.keyCode === 13 || e.keyCode === 32) {
+            runEditorFeature();
+        }
+    });
 
     var css = chrome.extension.getURL('css/styles.css');
     $('head').append('<link rel="stylesheet" href="' + css + '" type="text/css" />');
