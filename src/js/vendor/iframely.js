@@ -589,7 +589,7 @@
         if (result && options.httpsFirst) {
             result.sort(function(a, b) {
                 var sa = isHttps(a.href);
-                var sb = isHttps(a.href);
+                var sb = isHttps(b.href);
                 if (sa == sb) {
                     return 0;
                 }
