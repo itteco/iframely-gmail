@@ -352,19 +352,25 @@
 
                     var $p = null;
                     var $firstP = null;
+                    var $lastP = null;
                     link.$editor.find('div').each(function() {
                         var $this = $(this);
                         if (!$firstP) {
                             $firstP = $this;
                         }
-                        if (!$p && $this.text().indexOf(link.uri) > -1) {
+                        if ($this.text().indexOf('--') > -1) {
+                            $lastP = $this;
+                        }
+                        if (!$lastP && !$p && $this.text().indexOf(link.uri) > -1) {
                             $p = $this;
                         }
                     });
 
                     if ($p) {
                         $p.after($div);
-                    } else if ($firstP) {
+                    } else if ($lastP) {
+                        $firstP.before($div);
+                    } if ($firstP) {
                         $firstP.after($div);
                     } else {
                         link.$editor.append('<br>');
@@ -391,7 +397,7 @@
 
             var images = insertedImages[id] = insertedImages[id] || [];
 
-            var urls = $editor.html().replace(/<[^>]+>/g, " ").match(urlRe) || [];
+            var urls = $editor.html().split('--').slice(0, -1).join('--').replace(/<wbr>/g, "").replace(/<[^>]+>/g, " ").match(urlRe) || [];
 
             // Filter unique.
             urls = urls.filter(function(url) {
