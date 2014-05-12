@@ -376,7 +376,7 @@
                         $p.after($div);
                     } else if ($lastP) {
                         $firstP.before($div);
-                    } if ($firstP) {
+                    } else if ($firstP) {
                         $firstP.after($div);
                     } else {
                         link.$editor.append('<br>');
