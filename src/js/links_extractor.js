@@ -404,7 +404,7 @@
             var images = insertedImages[id] = insertedImages[id] || [];
 
             var bits = $editor.html().split('--');
-            if (bits > 0) {
+            if (bits.length > 0) {
                 bits = bits.slice(0, -1);
             }
 
