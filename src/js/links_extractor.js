@@ -168,6 +168,12 @@
                 link.$el.click(function(e) {
                     e.preventDefault();
 
+                    if (foundLink.href.indexOf('http://') === 0 && foundLink.type.indexOf('image') === -1 && foundLink.type.indexOf('video') === -1) {
+                        var win = window.open('http://' + DOMAIN + '/' + data.id, '_blank');
+                        win.focus();
+                        return;
+                    }
+
                     var m = foundLink.media;
                     var aspect = m['aspect-ratio'];
                     if (!aspect && m.width && m.height) {
