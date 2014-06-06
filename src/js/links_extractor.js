@@ -148,12 +148,6 @@
 
                 var image, player;
 
-                var links = [];
-                for(var key in data.links) {
-                    links = links.concat(data.links[key]);
-                }
-                data.links = links;
-
                 // Find good link.
                 var foundLink = $.iframely.filterLinksByRel(["player", "survey", "reader", "app", "image"], data.links, {returnOne: true, httpsFirst: true});
                 if (!foundLink) {
@@ -306,12 +300,6 @@
         loadLinkCached(link.uri, 'geditor', function(data) {
 
             var title = data.meta.title;
-
-            var links = [];
-            for(var key in data.links) {
-                links = links.concat(data.links[key]);
-            }
-            data.links = links;
 
             var image;
 
