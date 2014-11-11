@@ -105,8 +105,8 @@
 
     }, 1000);
 
-    var closeButtonText = '[close]';
     var embedButtonText = '[show]';
+    var closeButtonText = '[hide]';
 
     $('body').on('click', 'a[data-iframely-embed]', function(e) {
 
@@ -136,21 +136,26 @@
 
             if (error || !data.html) {
 
-                $link
-                    .css('color', 'red')
-                    .text('Error');
-
-                setTimeout(function() {
-                    $link.remove();
-                }, 1000);
-
                 if (data && data.meta && data.meta.title) {
+
+                    $link.remove();
+
                     $('a[href="' + href + '"]').each(function() {
                         var $l = $(this);
                         if ($l.text() === href) {
                             $l.text(data.meta.title);
                         }
                     });
+
+                } else {
+
+                    $link
+                        .css('color', 'red')
+                        .text('Sorry, no embeds');
+
+                    setTimeout(function() {
+                        $link.remove();
+                    }, 1000);
                 }
 
                 return;
