@@ -40,7 +40,7 @@
 
         var cache = linksCache[uri] = linksCache[uri] || {};
 
-        if (cache.data) {
+        if (cache.error || cache.data) {
             return cb(cache.error, cache.data);
         }
 
