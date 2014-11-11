@@ -110,6 +110,13 @@
 
     $('body').on('click', 'a[data-iframely-embed]', function(e) {
 
+        var scr = document.createElement('script');
+        scr.textContent = '(' + function () {
+            console.log('check', !!_gaq);
+        } + ')();';
+        $('body')[0].appendChild(scr);
+        scr.parentNode.removeChild(scr);
+
         e.preventDefault();
 
         var $link = $(this);
