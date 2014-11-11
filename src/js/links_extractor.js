@@ -40,12 +40,8 @@
 
         var cache = linksCache[uri] = linksCache[uri] || {};
 
-        if (cache.error) {
-            return;
-        }
-
         if (cache.data) {
-            return cb(cache.data);
+            return cb(cache.error, cache.data);
         }
 
         var stack = cache.stack = cache.stack || [];
@@ -64,7 +60,12 @@
                 if (e) {
                     cache.error = e;
                     error("iframely error on", uri, e, data);
-                    return cb(e);
+
+                    stack.forEach(function(cb) {
+                        cb(e);
+                    });
+
+                    return;
                 }
 
                 cache.data = data;
