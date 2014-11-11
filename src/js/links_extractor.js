@@ -162,7 +162,7 @@
             }
 
             $link.text(closeButtonText);
-            $link.after('<br data-iframely-close="' + closeId + '"><br data-iframely-close="' + closeId + '"><div style="width: 100%;" data-iframely-close="' + closeId + '">' + prepareEmbedCodeProtocol(data.html) + '</div>');
+            $link.after('<br data-iframely-close="' + closeId + '"><br data-iframely-close="' + closeId + '"><div style="width: 100%;" data-iframely-close="' + closeId + '">' + prepareEmbedCodeProtocol(data.html) + '</div><br data-iframely-close="' + closeId + '">');
         });
     });
 
