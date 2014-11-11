@@ -57,19 +57,20 @@
 
             $.iframely.getPageData(uri, {
                 origin: origin,
-                url: true
+                url: true,
+                iframe: 1
             }, function(e, data) {
 
                 if (e) {
                     cache.error = e;
                     error("iframely error on", uri, e, data);
-                    return;
+                    return cb(e);
                 }
 
                 cache.data = data;
 
                 stack.forEach(function(cb) {
-                    cb(data);
+                    cb(null, data);
                 });
             });
         }
@@ -104,7 +105,7 @@
     }, 1000);
 
     var closeButtonText = '[close]';
-    var embedButtonText = '[embed]';
+    var embedButtonText = '[show]';
 
     $('body').on('click', 'a[data-iframely-embed]', function(e) {
 
@@ -130,7 +131,30 @@
 
         $link.text('Loading...');
 
-        loadLinkCached(href, 'chromeembed', function(data) {
+        loadLinkCached(href, 'chrome', function(error, data) {
+
+            if (error || !data.html) {
+
+                $link
+                    .css('color', 'red')
+                    .text('Error');
+
+                setTimeout(function() {
+                    $link.remove();
+                }, 1000);
+
+                if (data && data.meta && data.meta.title) {
+                    $('a[href="' + href + '"]').each(function() {
+                        var $l = $(this);
+                        if ($l.text() === href) {
+                            $l.text(data.meta.title);
+                        }
+                    });
+                }
+
+                return;
+            }
+
             $link.text(closeButtonText);
             $link.after('<br data-iframely-close="' + closeId + '"><br data-iframely-close="' + closeId + '"><div style="width: 100%;" data-iframely-close="' + closeId + '">' + prepareEmbedCodeProtocol(data.html) + '</div>');
         });
