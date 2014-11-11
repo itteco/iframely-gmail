@@ -4,7 +4,7 @@
 
      Iframely consumer client lib.
 
-     Versrion 0.6.5
+     Version 0.7.0
 
      Fetches and renders iframely oebmed/2 widgets.
 
@@ -73,14 +73,35 @@
 
     $.iframely.setIframeHeight = function($iframe, height) {
 
-        var $parent = $iframe.parents('.iframely-widget-container');
+        var responsive = $iframe.attr('iframely-wrapped');
+        var $parent = $iframe.parent();
 
-        if ($parent.length > 0) {
+        if (typeof responsive === 'undefined') {
 
+            // Detect if <iframe> in responsive container.
+            var parentStyle = $parent.attr('style');
+            var iframeStyle = $iframe.attr('style');
+
+            if (parentStyle.match('position: relative;') &&
+                parentStyle.match('width: 100%;') &&
+                parentStyle.match('height: 0px;') &&
+                iframeStyle.match('height: 100%;') &&
+                iframeStyle.match('width: 100%;')) {
+
+                $iframe.attr('iframely-wrapped', true);
+                responsive = true;
+
+            } else {
+
+                $iframe.attr('iframely-wrapped', false);
+                responsive = false;
+            }
+        }
+
+        if (responsive) {
             $parent
                 .css('padding-bottom', '')
                 .css('height', height);
-
         } else {
             $iframe.css('height', height);
         }
@@ -88,7 +109,7 @@
 
     $.iframely.registerIframesIn = function($parent) {
 
-        $parent.find('iframe.iframely-iframe').each(function() {
+        $parent.find('iframe').each(function() {
 
             var $iframe = $(this);
 
@@ -132,7 +153,10 @@
                 meta: options.meta,
                 whitelist: options.whitelist,
                 api_key: options.api_key,
-                origin: options.origin
+                origin: options.origin,
+                autoplay: options.autoplay,
+                ssl: options.ssl,
+                html5: options.html5
             },
             success: function(data, textStatus, jqXHR) {
                 cb(null, data, jqXHR);
@@ -151,6 +175,26 @@
     $.iframely.defaults = {
         endpoint: "//iframely.com/iframely"
     };
+
+    $.iframely.get = function(endpoint, query, cb) {
+        $.ajax({
+            url: endpoint,
+            dataType: "json",
+            data: query,
+            success: function(data, textStatus, jqXHR) {
+                cb(null, data, jqXHR);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                var responseJSON = function() {
+                    try {
+                        return JSON.parse(jqXHR.responseText);
+                    } catch(e) {};
+                }();
+
+                cb((responseJSON && responseJSON.error) || jqXHR.status || errorThrown.message, responseJSON, jqXHR);
+            }
+        });
+    }
 
     function wrapContainer($element, data) {
 
@@ -223,7 +267,7 @@
             },
             generate: function(data) {
                 return $('<script>')
-                    .addClass("iframely-widget iframely-script")
+                    //.addClass("iframely-widget iframely-script")
                     .attr('type', data.type)
                     .attr('src', data.href);
             }
@@ -235,7 +279,7 @@
             },
             generate: function(data) {
                 var $img = $('<img>')
-                    .addClass("iframely-widget iframely-image")
+                    //.addClass("iframely-widget iframely-image")
                     .attr('src', data.href);
                 if (data.title) {
                     $img
@@ -256,7 +300,7 @@
 
                 var iframelyData = options && options.iframelyData;
 
-                var $video = $('<video controls>Your browser does not support HTML5 video.</video>');
+                var $video = $('<video controls' + (data.rel.indexOf('autoplay') > -1 ? ' autoplay' : '') + '>Your browser does not support HTML5 video.</video>');
 
                 if (iframelyData && iframelyData.links) {
 
@@ -284,7 +328,7 @@
                     }
 
                     // Find images with same aspect.
-                    var thumbnails = iterateLinks(iframelyData.links, function(link) {
+                    var thumbnails = $.iframely.filterLinks(iframelyData.links, function(link) {
                         if (renders["image"].test(link) && (link.rel.indexOf('thumbnail') > -1 || link.rel.indexOf('image') > -1)) {
                             var m = link.media;
                             if (aspect && m && m.width && m.height) {
@@ -331,16 +375,30 @@
                 }
             }
         },
+        "flash": {
+            test: function(data) {
+                return data.type === "application/x-shockwave-flash" && data.href;
+            },
+            generate: function(data, options) {
+
+                var $embed = $('<embed>')
+                    .attr('src', data.href)
+                    .attr('type', 'application/x-shockwave-flash');
+
+                if (options && options.disableSizeWrapper) {
+                    return $embed;
+                } else {
+                    return wrapContainer($embed, data);
+                }
+            }
+        },
         "iframe": {
             test: function(data) {
-                return (data.type == "text/html"
-                    || data.type == "application/x-shockwave-flash")
-                    && data.href;
+                return data.type == "text/html" && data.href;
             },
             generate: function(data, options) {
 
                 var $iframe = $('<iframe>')
-                    .addClass("iframely-widget iframely-iframe")
                     .attr('src', data.href)
                     .attr('frameborder', '0')
                     .attr('allowfullscreen', true)
@@ -393,7 +451,7 @@
 
     $.iframely.findBestFittedLink = function(targetWidth, targetHeight, links) {
 
-        var sizedLinks = iterateLinks(links, function(link) {
+        var sizedLinks = $.iframely.filterLinks(links, function(link) {
             var media = link.media;
             return media && media.width && media.height;
         });
@@ -478,7 +536,7 @@
     // This not works with scaling. Not used yet.
     $.iframely.findBestSizedLink = function(targetWidth, targetHeight, links) {
 
-        var sizedLinks = iterateLinks(links, function(link) {
+        var sizedLinks = $.iframely.filterLinks(links, function(link) {
             var media = link.media;
             return media && media.width && media.height;
         });
@@ -557,7 +615,7 @@
             return /^(?:https:)?\/\/.+/i.test(href);
         }
 
-        var result = iterateLinks(links, function(link) {
+        var result = $.iframely.filterLinks(links, function(link) {
 
             if (options.httpsOnly) {
                 if (!isHttps(link.href)) {
@@ -603,7 +661,7 @@
         return result;
     };
 
-    function iterateLinks(links, cb) {
+    $.iframely.filterLinks = function(links, cb) {
 
         if (links) {
 
@@ -629,6 +687,8 @@
                 return result;
             }
         }
+
+        return [];
     }
 
     function firstLink(links) {
