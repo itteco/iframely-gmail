@@ -1,6 +1,21 @@
 (function() {
 
-    var API_ENDPOINT = '//iframely.com/gmail';
+    function prepareUrlProtocol(url) {
+        if (document.location.protocol === 'file:') {
+            url = 'http:' + url;
+        }
+        return url;
+    }
+
+    function prepareEmbedCodeProtocol(code) {
+        if (document.location.protocol === 'file:') {
+            code = code.replace(/src="\/\//i, 'src="http://');
+        }
+        return code;
+
+    }
+
+    var API_ENDPOINT = prepareUrlProtocol('//iframely.com/gmail');
 
     function log() {
         console.log.apply(console, arguments);
@@ -8,13 +23,6 @@
 
     function error() {
         console.error.apply(console, arguments);
-    }
-
-    function getKey(key, cb) {
-        chrome.extension.sendMessage({
-            method: "getLocalStorage",
-            key: key
-        }, cb);
     }
 
     function isWhitelisted(uri, cb) {
@@ -96,12 +104,7 @@
     }, 1000);
 
     var closeButtonText = '[close]';
-    var embedButtonText = '[embed]'
-
-    $('body').on('click', 'textarea[data-iframely-close]', function() {
-        var $input = $(this);
-        $input.select();
-    });
+    var embedButtonText = '[embed]';
 
     $('body').on('click', 'a[data-iframely-embed]', function(e) {
 
@@ -129,7 +132,7 @@
 
         loadLinkCached(href, 'chromeembed', function(data) {
             $link.text(closeButtonText);
-            $link.after('<br data-iframely-close="' + closeId + '"><br data-iframely-close="' + closeId + '"><textarea style="width: 400px; height: 100px;" data-iframely-close="' + closeId + '">' + data.html + '</textarea>');
+            $link.after('<br data-iframely-close="' + closeId + '"><br data-iframely-close="' + closeId + '"><div style="width: 100%;" data-iframely-close="' + closeId + '">' + prepareEmbedCodeProtocol(data.html) + '</div>');
         });
     });
 

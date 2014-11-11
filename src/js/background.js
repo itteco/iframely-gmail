@@ -1,16 +1,5 @@
 (function() {
 
-    chrome.extension.onMessage.addListener(
-        function(message, sender, cb) {
-            if (message && message.method == "getLocalStorage") {
-                cb(localStorage[message.key]);
-            }
-            if (message && message.method == "setLocalStorage") {
-                localStorage[message.key] = message.value;
-            }
-        }
-    );
-
     function onInstall(currentVersion) {
         chrome.tabs.create({url: 'http://iframe.ly/gmail-thankyou'});
     }

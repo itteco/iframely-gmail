@@ -15,7 +15,7 @@
             "js/vendor/iframely.js",
             "js/links_extractor.js"
         ],
-        "matches": [ "http://*/*", "https://*/*" ],
+        "matches": [ "http://*/*", "https://*/*" , "file://*/*"],
         "run_at": "document_end"
     } ],
     "background" : {
