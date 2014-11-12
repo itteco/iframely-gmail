@@ -7,6 +7,10 @@
         return url;
     }
 
+    function removeUrlProtocol(url) {
+        return url.replace(/https?:/gi, '');
+    }
+
     function prepareEmbedCodeProtocol(code) {
         if (document.location.protocol === 'file:') {
             code = code.replace(/src="\/\//i, 'src="http://');
@@ -97,7 +101,7 @@
             var href = $link.attr('href');
             var text = $link.text();
 
-            if (href === text) {
+            if (removeUrlProtocol(href) === removeUrlProtocol(text)) {
                 $link.after(' <a href="#" data-iframely-embed="' + href + '">' + embedButtonText + '</a>')
             }
         });
