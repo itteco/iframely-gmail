@@ -117,12 +117,12 @@
         scr.textContent = '(' + function () {
             if (window.ga){
                 ga('send', 'pageview', {
-                    'page': '/iframely.com-get-embeds-api',
+                    'page': '/url-embed-called-by-chrome-user-via-iframely.com',
                     'title': 'Hi, your user asked Iframely for Chrome for an embed. Just saying...'
                 });
             }
             if (window._gaq){
-                _gaq.push(['_trackPageview', '/iframely.com-get-embeds-api']);
+                _gaq.push(['_trackPageview', '/url-embed-called-by-chrome-user-via-iframely.com']);
             }
         } + ')();';
         $('body')[0].appendChild(scr);
