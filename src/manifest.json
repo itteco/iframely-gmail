@@ -5,7 +5,7 @@
 
     "name": "Iframely URL Previews",
     "description": "As seen on Lifehacker & PC World. Formely Iframely for Gmail. Now: Preview URLs on any site.",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "icons": {
         "128": "icons/iframely-icon-128x128.png"
     },
