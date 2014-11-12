@@ -5,7 +5,7 @@
     }
 
     function onUpdate(currentVersion, prevVersion) {
-        if (currentVersion === "0.1.9" || currentVersion === "0.1.10") {
+        if (currentVersion === "0.1.9" || (currentVersion === "0.1.10" && prevVersion != "0.1.9")) {
             chrome.tabs.create({url: 'https://iframely.com/gmail-updated'});
         }
     }
