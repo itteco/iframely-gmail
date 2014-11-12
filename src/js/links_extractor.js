@@ -71,7 +71,7 @@
         /google/i
     ];
 
-    var urlRe = /https?:\/\/[^ ,"]+/ig;
+    var urlRe = /https?:\/\/[^ \/,"]+\/[^ ,"]+/ig;
 
     function skippedHref(uri) {
         for(var i = 0; i < skipHrefRe.length; i++) {
@@ -148,14 +148,8 @@
 
                 var image, player;
 
-                var links = [];
-                for(var key in data.links) {
-                    links = links.concat(data.links[key]);
-                }
-                data.links = links;
-
                 // Find good link.
-                var foundLink = $.iframely.filterLinksByRel(["player", "survey", "reader", "app", "image"], data.links, {returnOne: true});
+                var foundLink = $.iframely.filterLinksByRel(["player", "survey", "reader", "app", "image"], data.links, {returnOne: true, httpsFirst: true});
                 if (!foundLink) {
                     // Skip non interesting link.
                     return;
@@ -168,6 +162,12 @@
                 link.$el.click(function(e) {
                     e.preventDefault();
 
+                    if (foundLink.href && foundLink.href.indexOf('http://') === 0 && foundLink.type.indexOf('image') === -1 && foundLink.type.indexOf('video') === -1) {
+                        var win = window.open('http://' + DOMAIN + '/' + data.id, '_blank');
+                        win.focus();
+                        return;
+                    }
+
                     var m = foundLink.media;
                     var aspect = m['aspect-ratio'];
                     if (!aspect && m.width && m.height) {
@@ -178,7 +178,7 @@
                     var x =
                         '<div class="iframely-gmail">' +
                         '    <div class="iframely-gmail__toolbar">' +
-                        '        <a href="' + DOMAIN + '/' + data.id + '" target="_blank" class="iframely-gmail__btn iframely-gmail__btn--logo" title="Go to Iframely"></a>' +
+                        '        <a href="http://' + DOMAIN + '/' + data.id + '" target="_blank" class="iframely-gmail__btn iframely-gmail__btn--logo" title="Go to Iframely"></a>' +
                         '        <button class="iframely-gmail__btn iframely-gmail__btn--link s-open-new" title="Pop-out"></button>' +
                         '        <button class="iframely-gmail__btn iframely-gmail__btn--close s-close" title="Close"></button>' +
                         '    </div>' +
@@ -301,12 +301,6 @@
 
             var title = data.meta.title;
 
-            var links = [];
-            for(var key in data.links) {
-                links = links.concat(data.links[key]);
-            }
-            data.links = links;
-
             var image;
 
             // Find big image.
@@ -352,18 +346,24 @@
 
                     var $p = null;
                     var $firstP = null;
+                    var $lastP = null;
                     link.$editor.find('div').each(function() {
                         var $this = $(this);
                         if (!$firstP) {
                             $firstP = $this;
                         }
-                        if (!$p && $this.text().indexOf(link.uri) > -1) {
+                        if ($this.text().indexOf('--') > -1) {
+                            $lastP = $this;
+                        }
+                        if (!$lastP && !$p && $this.text().indexOf(link.uri) > -1) {
                             $p = $this;
                         }
                     });
 
                     if ($p) {
                         $p.after($div);
+                    } else if ($lastP) {
+                        $firstP.before($div);
                     } else if ($firstP) {
                         $firstP.after($div);
                     } else {
@@ -383,7 +383,7 @@
 
     function runEditorFeature() {
 
-        $('.Am.Al.editable.LW-avf').each(function() {
+        $('.Am.Al.editable.LW-avf:focus').each(function() {
 
             var $editor = $(this);
 
@@ -391,7 +391,17 @@
 
             var images = insertedImages[id] = insertedImages[id] || [];
 
-            var urls = $editor.html().replace(/<[^>]+>/g, " ").match(urlRe) || [];
+            var bits = $editor.html().split('--');
+            if (bits.length > 1) {
+                bits = bits.slice(0, -1);
+            }
+
+            var text = bits.join('--');
+
+            var urls = text
+                .replace(/(<wbr>|&nbsp;)/g, "")
+                .replace(/<[^>]+>/g, " ")
+                .match(urlRe) || [];
 
             // Filter unique.
             urls = urls.filter(function(url) {
@@ -417,11 +427,17 @@
 
         enableEditorFeature(function(enabled) {
             if (enabled) {
-                runEditorFeature();
+
             }
         });
 
     }, 1000);
+
+    $('body').keyup(function(e) {
+        if (e.keyCode === 13 || e.keyCode === 32) {
+            runEditorFeature();
+        }
+    });
 
     var css = chrome.extension.getURL('css/styles.css');
     $('head').append('<link rel="stylesheet" href="' + css + '" type="text/css" />');
