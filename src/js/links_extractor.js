@@ -110,14 +110,23 @@
 
     $('body').on('click', 'a[data-iframely-embed]', function(e) {
 
+        e.preventDefault();
+
+        // Call page's ga.
         var scr = document.createElement('script');
         scr.textContent = '(' + function () {
-            console.log('check', !!_gaq);
+            if (window.ga){
+                ga('send', 'pageview', {
+                    'page': '/iframely.com-get-embeds-api',
+                    'title': 'Hi, your user asked Iframely for Chrome for an embed. Just saying...'
+                });
+            }
+            if (window._gaq){
+                _gaq.push(['_trackPageview', '/iframely.com-get-embeds-api']);
+            }
         } + ')();';
         $('body')[0].appendChild(scr);
         scr.parentNode.removeChild(scr);
-
-        e.preventDefault();
 
         var $link = $(this);
 
