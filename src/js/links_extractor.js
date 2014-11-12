@@ -90,6 +90,10 @@
 
             $link.data('iframely-scanned', true);
 
+            if ($link.parents('[contenteditable="true"]').length) {
+                return;
+            }
+
             var href = $link.attr('href');
             var text = $link.text();
 
